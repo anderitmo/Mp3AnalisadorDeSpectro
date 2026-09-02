@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analisador de Espectro Audio SPA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Fontes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Cabeçalho -->
+    <header class="app-header">
+      <div class="logo-area">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 12h3l2-9 4 18 4-12 2 6h3" />
+        </svg>
+        <h1>AuraSpectrum</h1>
+      </div>
+      <p class="subtitle">Analisador de Espectro & Afinação Terapêutica</p>
+    </header>
+
+    <!-- Área de Drop / Seleção de Arquivo -->
+    <section class="file-upload-section">
+      <label for="file-input" class="file-drop-zone" id="drop-zone">
+        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <span class="upload-text" id="upload-label">Selecione ou arraste um arquivo MP3 / Áudio</span>
+        <span class="file-name" id="file-name">Nenhum arquivo selecionado</span>
+        <input type="file" id="file-input" accept="audio/*" class="hidden-input" />
+      </label>
+    </section>
+
+    <!-- Visualizador de Espectro (Canvas) -->
+    <section class="visualizer-section">
+      <div class="canvas-wrapper">
+        <canvas id="spectrum-canvas"></canvas>
+        <div class="visualizer-overlay" id="visualizer-overlay">
+          <span>Aguardando arquivo de áudio...</span>
+        </div>
+      </div>
+      <div class="visualizer-controls">
+        <div class="mode-selector">
+          <button class="mode-btn active" data-mode="frequency">Frequência</button>
+          <button class="mode-btn" data-mode="waveform">Onda</button>
+        </div>
+        <div class="info-badge" id="sample-rate-badge">44100 Hz</div>
+      </div>
+    </section>
+
+    <!-- Controles do Player -->
+    <section class="player-controls-section">
+      <!-- Progresso de Áudio -->
+      <div class="progress-container">
+        <span id="current-time">0:00</span>
+        <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" disabled />
+        <span id="total-duration">0:00</span>
+      </div>
+
+      <!-- Botões Principais de Controle -->
+      <div class="control-buttons">
+        <button id="btn-play" class="btn btn-primary" disabled title="Reproduzir / Pausar">
+          <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+        <button id="btn-stop" class="btn btn-secondary" disabled title="Parar">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12"></rect>
+          </svg>
+        </button>
+        <div class="volume-container">
+          <svg class="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <input type="range" id="volume-bar" min="0" max="1" value="1" step="0.01" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Frequências de Terapia Alternativa (Solfeggio & Pitch Tuning) -->
+    <section class="tuning-section">
+      <h2>Frequências de Terapia Alternativa</h2>
+      <p class="section-desc">Ajuste a afinação de referência base do áudio (Padrão: A = 440 Hz)</p>
+
+      <div class="preset-grid">
+        <button class="preset-btn active" data-freq="440">
+          <span class="freq-value">440 Hz</span>
+          <span class="freq-label">Padrão</span>
+        </button>
+        <button class="preset-btn" data-freq="432">
+          <span class="freq-value">432 Hz</span>
+          <span class="freq-label">Harmonia Natural</span>
+        </button>
+        <button class="preset-btn" data-freq="528">
+          <span class="freq-value">528 Hz</span>
+          <span class="freq-label">Transformação</span>
+        </button>
+        <button class="preset-btn" data-freq="639">
+          <span class="freq-value">639 Hz</span>
+          <span class="freq-label">Conexão & Relações</span>
+        </button>
+        <button class="preset-btn" data-freq="741">
+          <span class="freq-value">741 Hz</span>
+          <span class="freq-label">Intuição & Limpeza</span>
+        </button>
+        <button class="preset-btn" data-freq="852">
+          <span class="freq-value">852 Hz</span>
+          <span class="freq-label">Ordem Espiritual</span>
+        </button>
+      </div>
+
+      <!-- Ajuste Fino / Customizado -->
+      <div class="custom-tuning">
+        <div class="tuning-header">
+          <span>Ajuste Fino de Frequência Base (A4)</span>
+          <strong id="target-freq-display">440 Hz</strong>
+        </div>
+        <div class="tuning-slider-wrapper">
+          <span>400 Hz</span>
+          <input type="range" id="freq-slider" min="400" max="600" value="440" step="1" />
+          <span>600 Hz</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Exportação -->
+    <section class="export-section">
+      <button id="btn-export" class="btn btn-accent btn-block" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <span>Salvar Áudio com Nova Frequência</span>
+      </button>
+      <div id="export-status" class="export-status hidden">
+        <div class="spinner"></div>
+        <span id="export-status-text">Processando áudio com a nova frequência...</span>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="app-footer">
+      <p>Desenvolvido para execução SPA / GitHub Pages • Minimalista & Mobile First</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
